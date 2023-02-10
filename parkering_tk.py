@@ -12,7 +12,7 @@ def create_db():
                 first_name TEXT,
                 last_name TEXT,
                 department TEXT,
-                employee_number TEXT,
+                employee_number INT,
                 car_reg1 TEXT,
                 car_brand1 TEXT,
                 car_reg2 TEXT,
@@ -70,6 +70,19 @@ def clear_fields():
     car_brand2_entry.delete(0, tk.END)
 
 def validate_inputs():
+    first_name = first_name_entry.get()
+    last_name = last_name_entry.get()
+    department = department_entry.get()
+    employee_number = employee_number_entry.get()
+    car_reg1 = car_reg1_entry.get()
+    car_brand1 = car_brand1_entry.get()
+    
+    if not first_name or not last_name or not department or not employee_number or not car_reg1 or not car_brand1:
+        messagebox.showerror("Error", "Alle feltene må fylles ut.")
+        return False
+    return True
+
+def edit_validate_inputs(first_name_entry, last_name_entry, department_entry, employee_number_entry, car_reg1_entry, car_brand1_entry):
     first_name = first_name_entry.get()
     last_name = last_name_entry.get()
     department = department_entry.get()
@@ -174,24 +187,25 @@ def delete_employee():
 
 def save_changes(selected_item, id_entry, first_name_entry, last_name_entry, department_entry, employee_number_entry, car_reg1_entry, car_brand1_entry, car_reg2_entry, car_brand2_entry):
     if messagebox.askyesno("Lagre endringer", "Vil du lagre endringene?"):
-        conn = sqlite3.connect('employees.db')
-        c = conn.cursor()
-        c.execute("UPDATE employees SET first_name=?, last_name=?, department=?, employee_number=?, car_reg1=?, car_brand1=?, car_reg2=?, car_brand2=? WHERE id=?", (
-            first_name_entry.get(),
-            last_name_entry.get(),
-            department_entry.get(),
-            employee_number_entry.get(),
-            car_reg1_entry.get(),
-            car_brand1_entry.get(),
-            car_reg2_entry.get(),
-            car_brand2_entry.get(),
-            id_entry.get()
-        ))
-        if not validate_inputs():
+        if edit_validate_inputs(first_name_entry, last_name_entry, department_entry, employee_number_entry, car_reg1_entry, car_brand1_entry):
+
+            conn = sqlite3.connect('employees.db')
+            c = conn.cursor()
+            c.execute("UPDATE employees SET first_name=?, last_name=?, department=?, employee_number=?, car_reg1=?, car_brand1=?, car_reg2=?, car_brand2=? WHERE id=?", (
+                first_name_entry.get(),
+                last_name_entry.get(),
+                department_entry.get(),
+                employee_number_entry.get(),
+                car_reg1_entry.get(),
+                car_brand1_entry.get(),
+                car_reg2_entry.get(),
+                car_brand2_entry.get(),
+                id_entry.get()
+            ))
+            conn.commit()
+            conn.close()
+        else:
             return
-        conn.commit()
-        conn.close()
-        
         employees_list.item(selected_item, values=(
             id_entry.get(), 
             first_name_entry.get(), 
@@ -281,42 +295,42 @@ root = tk.Tk()
 root.title("Parkeringsregister")
 
 # Create the input fields
-first_name_label = tk.Label(root, text="Fornavn")
+first_name_label = tk.Label(root, text="Fornavn:")
 first_name_label.grid(row=1, column=0, padx=10, pady=10)
 first_name_entry = tk.Entry(root)
 first_name_entry.grid(row=1, column=1, padx=10, pady=10)
 
-last_name_label = tk.Label(root, text="Etternavn")
+last_name_label = tk.Label(root, text="Etternavn:")
 last_name_label.grid(row=2, column=0, padx=10, pady=10)
 last_name_entry = tk.Entry(root)
 last_name_entry.grid(row=2, column=1, padx=10, pady=10)
 
-department_label = tk.Label(root, text="Avdeling")
+department_label = tk.Label(root, text="Avdeling:")
 department_label.grid(row=3, column=0, padx=10, pady=10)
 department_entry = tk.Entry(root)
 department_entry.grid(row=3, column=1, padx=10, pady=10)
 
-employee_number_label = tk.Label(root, text="Ansattnummer")
+employee_number_label = tk.Label(root, text="Ansattnummer:")
 employee_number_label.grid(row=4, column=0, padx=10, pady=10)
 employee_number_entry = tk.Entry(root)
 employee_number_entry.grid(row=4, column=1, padx=10, pady=10)
 
-car_reg1_label = tk.Label(root, text="Bilreg 1")
+car_reg1_label = tk.Label(root, text="Bilreg 1:")
 car_reg1_label.grid(row=5, column=0, padx=10, pady=10)
 car_reg1_entry = tk.Entry(root)
 car_reg1_entry.grid(row=5, column=1, padx=10, pady=10)
 
-car_brand1_label = tk.Label(root, text="Bilmerke 1")
+car_brand1_label = tk.Label(root, text="Bilmerke 1:")
 car_brand1_label.grid(row=6, column=0, padx=10, pady=10)
 car_brand1_entry = tk.Entry(root)
 car_brand1_entry.grid(row=6, column=1, padx=10, pady=10)
 
-car_reg2_label = tk.Label(root, text="Bilreg 2")
+car_reg2_label = tk.Label(root, text="Bilreg 2:")
 car_reg2_label.grid(row=7, column=0, padx=10, pady=10)
 car_reg2_entry = tk.Entry(root)
 car_reg2_entry.grid(row=7, column=1, padx=10, pady=10)
 
-car_brand2_label = tk.Label(root, text="Bilmerke 2")
+car_brand2_label = tk.Label(root, text="Bilmerke 2:")
 car_brand2_label.grid(row=8, column=0, padx=10, pady=10)
 car_brand2_entry = tk.Entry(root)
 car_brand2_entry.grid(row=8, column=1, padx=10, pady=10)
@@ -383,6 +397,6 @@ search_entry_label.grid(row=0, column=2, padx=10, pady=10, sticky="w")
 search_entry.grid(row=0, column=2, padx=110, pady=10, sticky="w")
 search_entry.bind("<KeyRelease>", search_employees)
 
-
-
 root.mainloop()
+
+
