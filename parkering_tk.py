@@ -52,7 +52,7 @@ def view_employees():
     employees_list.delete(*employees_list.get_children())
     conn = sqlite3.connect('employees.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM employees")
+    c.execute("SELECT * FROM employees ORDER BY id DESC")
     rows = c.fetchall()
     for row in rows:
         employees_list.insert("", tk.END, values=row)
@@ -188,7 +188,6 @@ def delete_employee():
 def save_changes(selected_item, id_entry, first_name_entry, last_name_entry, department_entry, employee_number_entry, car_reg1_entry, car_brand1_entry, car_reg2_entry, car_brand2_entry):
     if messagebox.askyesno("Lagre endringer", "Vil du lagre endringene?"):
         if edit_validate_inputs(first_name_entry, last_name_entry, department_entry, employee_number_entry, car_reg1_entry, car_brand1_entry):
-
             conn = sqlite3.connect('employees.db')
             c = conn.cursor()
             c.execute("UPDATE employees SET first_name=?, last_name=?, department=?, employee_number=?, car_reg1=?, car_brand1=?, car_reg2=?, car_brand2=? WHERE id=?", (
@@ -213,7 +212,7 @@ def save_changes(selected_item, id_entry, first_name_entry, last_name_entry, dep
             department_entry.get(), 
             employee_number_entry.get(), 
             car_reg1_entry.get(), 
-            car_brand1_entry.get(), 
+            car_brand1_entry.get(),
             car_reg2_entry.get(), 
             car_brand2_entry.get()
         ))
@@ -251,7 +250,7 @@ def load_data():
     conn = sqlite3.connect("employees.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM employees")
+    cursor.execute("SELECT * FROM employees ORDER BY id DESC")
     data = cursor.fetchall()
 
     for row in data:
@@ -266,8 +265,7 @@ def search_employees(*args):
     if not search_text:
         conn = sqlite3.connect('employees.db')
         c = conn.cursor()
-        c.execute("SELECT * FROM employees WHERE first_name LIKE ? OR last_name LIKE ? OR department LIKE ? OR employee_number LIKE ? OR car_reg1 LIKE ? OR car_brand1 LIKE ? OR car_reg2 LIKE ? OR car_brand2 LIKE ? OR user LIKE ?", ('%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%',))
-
+        c.execute("SELECT * FROM employees WHERE first_name LIKE ? OR last_name LIKE ? OR department LIKE ? OR employee_number LIKE ? OR car_reg1 LIKE ? OR car_brand1 LIKE ? OR car_reg2 LIKE ? OR car_brand2 LIKE ? OR user LIKE ? ORDER BY id DESC", ('%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%',))
         rows = c.fetchall()
         for row in rows:
             employees_list.insert("", tk.END, values=row)
@@ -275,7 +273,7 @@ def search_employees(*args):
     else:
         conn = sqlite3.connect('employees.db')
         c = conn.cursor()
-        c.execute("SELECT * FROM employees WHERE first_name LIKE ? OR last_name LIKE ? OR department LIKE ? OR employee_number LIKE ? OR car_reg1 LIKE ? OR car_brand1 LIKE ? OR car_reg2 LIKE ? OR car_brand2 LIKE ? OR user LIKE ?", ('%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%',))
+        c.execute("SELECT * FROM employees WHERE first_name LIKE ? OR last_name LIKE ? OR department LIKE ? OR employee_number LIKE ? OR car_reg1 LIKE ? OR car_brand1 LIKE ? OR car_reg2 LIKE ? OR car_brand2 LIKE ? OR user LIKE ? ORDER BY id DESC", ('%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%', '%' + search_text + '%',))
         rows = c.fetchall()
         for row in rows:
             employees_list.insert("", tk.END, values=row)
@@ -354,7 +352,7 @@ employees_list.grid(row=1, column=2, rowspan=8, padx=10, pady=10, sticky="nsew")
 
 # Set up the columns for the list of employees
 employees_list.heading("id", text="ID", anchor=tk.W)
-employees_list.column("id", stretch=tk.NO, width=30, anchor=tk.W)
+employees_list.column("id", stretch=tk.NO, width=40, anchor=tk.W)
 employees_list.heading("first_name", text="Fornavn", anchor=tk.W, command=lambda: sort_treeview_column(employees_list, "first_name", False))
 employees_list.column("first_name", stretch=tk.NO, width=120, anchor=tk.W)
 employees_list.heading("last_name", text="Etternavn", anchor=tk.W, command=lambda: sort_treeview_column(employees_list, "last_name", False))
@@ -398,5 +396,4 @@ search_entry.grid(row=0, column=2, padx=110, pady=10, sticky="w")
 search_entry.bind("<KeyRelease>", search_employees)
 
 root.mainloop()
-
 
